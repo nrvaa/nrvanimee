@@ -1,5 +1,6 @@
 import AnimeList from "@/components/AnimeList";
 import Header from "@/components/AnimeList/Header";
+import { jikanFetch } from "@/lib/api";
 
 export const metadata = {
     title: "Seasonal Anime | NRVANIMELIST",
@@ -7,8 +8,7 @@ export const metadata = {
 };
 
 const Page = async () => {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/seasons/now`);
-    const seasonalAnime = await response.json();
+    const seasonalAnime = await jikanFetch('/seasons/now');
 
     return (
         <div className="flex flex-col flex-1 bg-swiss-muted swiss-diagonal">

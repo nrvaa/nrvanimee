@@ -20,7 +20,9 @@ export const jikanFetch = async (endpoint, options = {}) => {
         ...options
     };
     
-    const url = `${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`;
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.jikan.moe/v4';
+    const url = `${baseUrl}${endpoint}`;
+    
     const response = await fetch(url, fetchOptions);
     return response.json();
 };

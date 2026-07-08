@@ -38,10 +38,6 @@ const EndlessAnime = () => {
     };
 
     useEffect(() => {
-        fetchAnime(page);
-    }, [page]);
-
-    useEffect(() => {
         if (page > 1) {
             fetchAnime(page);
         }
