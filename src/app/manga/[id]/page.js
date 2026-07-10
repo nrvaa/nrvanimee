@@ -1,18 +1,54 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { useParams } from "next/navigation"
 import Image from "next/image"
 import SaveButton from "@/components/SaveButton"
 
-const Page = async ({ params }) => {
-    const { id } = await params;
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/manga/${id}/full`);
-    const manga = await response.json();
-    const data = manga.data;
+const Page = () => {
+    const { id } = useParams();
+    const [data, setData] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        if (!id) return;
+        const fetchData = async () => {
+            try {
+                const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.jikan.moe/v4';
+                const response = await fetch(`${baseUrl}/manga/${id}/full`);
+                const manga = await response.json();
+                setData(manga.data || null);
+            } catch (error) {
+                console.error("Error fetching manga details:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [id]);
+
+    useEffect(() => {
+        if (data?.title) {
+            document.title = `${data.title} | NRVANIMELIST`;
+        }
+    }, [data]);
+
+    if (isLoading) {
+        return (
+            <div className="flex flex-col flex-1 items-center justify-center min-h-[50vh] bg-swiss-white border-b-4 border-black">
+                <p className="text-2xl font-bold tracking-widest animate-pulse">
+                    LOADING...
+                </p>
+            </div>
+        );
+    }
 
     if (!data) {
         return (
              <div className="py-24 border-2 border-black p-12 text-center bg-swiss-muted m-8">
                <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black">NOT FOUND</h2>
              </div>
-        )
+        );
     }
 
     return (
@@ -83,7 +119,7 @@ const Page = async ({ params }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default Page
+export default Page;

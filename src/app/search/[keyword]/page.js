@@ -1,22 +1,49 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams, useSearchParams } from "next/navigation";
 import AnimeList from "@/components/AnimeList";
 import Header from "@/components/AnimeList/Header";
 import Link from "next/link";
 
-const Page = async ({ params, searchParams }) => {
-  const { keyword } = await params;
-  const { order_by = '', sort = '' } = await searchParams || {};
+const Page = () => {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  
+  const keyword = params?.keyword || "";
+  const order_by = searchParams?.get("order_by") || "";
+  const sort = searchParams?.get("sort") || "";
   
   const decodedKeyword = decodeURI(keyword);
-
-  // Build URL with params
-  let url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/anime?q=${decodedKeyword}`;
-  if (order_by) url += `&order_by=${order_by}`;
-  if (sort) url += `&sort=${sort}`;
-
-  const response = await fetch(url);
-  const searchAnime = await response.json();
-
   const currentFilter = order_by || "default";
+
+  const [searchAnime, setSearchAnime] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!keyword) return;
+    document.title = `Search: ${decodedKeyword} | NRVANIMELIST`;
+    
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://api.jikan.moe/v4';
+        let url = `${baseUrl}/anime?q=${decodedKeyword}`;
+        if (order_by) url += `&order_by=${order_by}`;
+        if (sort) url += `&sort=${sort}`;
+
+        const response = await fetch(url);
+        const result = await response.json();
+        setSearchAnime(result);
+      } catch (error) {
+        console.error("Error searching anime:", error);
+        setSearchAnime({ error: true, message: error.message });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [keyword, order_by, sort]);
 
   return (
     <div className="flex flex-col flex-1 bg-swiss-muted swiss-diagonal">
@@ -58,16 +85,22 @@ const Page = async ({ params, searchParams }) => {
             </Link>
           </div>
 
-          {searchAnime.error || searchAnime.status >= 400 ? (
+          {isLoading ? (
+            <div className="py-24 border-2 border-black p-12 text-center bg-swiss-muted swiss-diagonal w-full">
+              <p className="text-2xl font-bold tracking-widest animate-pulse">
+                LOADING SEARCH RESULTS...
+              </p>
+            </div>
+          ) : searchAnime?.error || searchAnime?.status >= 400 ? (
             <div className="py-24 border-2 border-black p-12 text-center bg-swiss-muted swiss-diagonal">
               <h2 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-black">
                 API ERROR
               </h2>
               <p className="mt-4 font-bold text-swiss-red tracking-widest uppercase">
-                {searchAnime.message || "Failed to fetch from MyAnimeList"}
+                {searchAnime?.message || "Failed to fetch from MyAnimeList"}
               </p>
             </div>
-          ) : searchAnime.data && searchAnime.data.length > 0 ? (
+          ) : searchAnime?.data && searchAnime.data.length > 0 ? (
             <AnimeList api={searchAnime} />
           ) : (
             <div className="py-24 border-2 border-black p-12 text-center bg-swiss-muted swiss-diagonal">

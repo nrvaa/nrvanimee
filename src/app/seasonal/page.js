@@ -1,25 +1,53 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import AnimeList from "@/components/AnimeList";
 import Header from "@/components/AnimeList/Header";
 import { jikanFetch } from "@/lib/api";
 
-export const metadata = {
-    title: "Seasonal Anime | NRVANIMELIST",
-    description: "Currently airing seasonal anime.",
-};
+const Page = () => {
+  const [seasonalAnime, setSeasonalAnime] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-const Page = async () => {
-    const seasonalAnime = await jikanFetch('/seasons/now');
+  useEffect(() => {
+    document.title = "Seasonal Anime | NRVANIMELIST";
+    const fetchData = async () => {
+      try {
+        const response = await jikanFetch("/seasons/now");
+        setSeasonalAnime(response);
+      } catch (error) {
+        console.error("Error fetching seasonal anime:", error);
+        setSeasonalAnime({ error: true, message: error.message });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
+  if (isLoading) {
     return (
-        <div className="flex flex-col flex-1 bg-swiss-muted swiss-diagonal">
-            <div className="container mx-auto px-8 py-12 md:py-24">
-                <div className="border-4 border-black p-8 md:p-12 bg-white" style={{boxShadow: "24px 24px 0px 0px var(--theme-black)"}}>
-                    <Header title="CURRENT SEASON" />
-                    <AnimeList api={seasonalAnime} />
-                </div>
-            </div>
-        </div>
+      <div className="flex flex-col flex-1 items-center justify-center min-h-[50vh] bg-swiss-muted swiss-diagonal border-b-4 border-black">
+        <p className="text-2xl font-bold tracking-widest animate-pulse">
+          LOADING...
+        </p>
+      </div>
     );
+  }
+
+  return (
+    <div className="flex flex-col flex-1 bg-swiss-muted swiss-diagonal">
+      <div className="container mx-auto px-8 py-12 md:py-24">
+        <div
+          className="border-4 border-black p-8 md:p-12 bg-white"
+          style={{ boxShadow: "24px 24px 0px 0px var(--theme-black)" }}
+        >
+          <Header title="CURRENT SEASON" />
+          <AnimeList api={seasonalAnime} />
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Page;
