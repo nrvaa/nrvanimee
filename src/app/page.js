@@ -1,12 +1,25 @@
+
+
 import AnimeList from "@/components/AnimeList";
 import Header from "@/components/AnimeList/Header";
 import EndlessAnime from "@/components/EndlessAnime";
 import { jikanFetch } from "@/lib/api";
+// import { config } from "dotenv";
+// import { useQuery } from '@tanstack/react-query';
+
+// function topAnime({ topAnime }) {
+//   const { data, isLoading } = useQuery({
+//     queryKey: ['anime', mal_id],
+//     queryFn: () => fetch(`${NEXT_PUBLIC_API_BASE_URL}/top/anime/${mal_id}`).then(res => res.json()),
+//     staleTime: 1000 * 60 * 5, // Data is considered fresh for 5 minutes
+//     gcTime: 1000 * 60 * 10,    // Keeps data in memory for 10 minutes after unmount
+//   });
+// }
+
 
 const Page = async () => {
-  const topAnime = await jikanFetch('/top/anime?limit=8');
-  const topManga = await jikanFetch('/top/manga?limit=8');
-  const topChar = await jikanFetch('/top/characters?limit=8');
+  const topAnime = await jikanFetch('/top/anime?limit=4');
+  const topManga = await jikanFetch('/top/manga?limit=2');
   const recs = await jikanFetch('/recommendations/anime');
   
   let recAnime = [];
@@ -23,6 +36,7 @@ const Page = async () => {
           if (recAnime.length >= 8) break;
       }
   }
+
 
   return (
     <div className="flex flex-col">

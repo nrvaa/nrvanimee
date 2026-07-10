@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import AnimeList from "@/components/AnimeList";
+import { jikanFetch } from "@/lib/api";
 
 const EndlessAnime = () => {
     const [animeList, setAnimeList] = useState([]);
@@ -17,8 +18,7 @@ const EndlessAnime = () => {
         fetchInProgress.current = true;
         setLoading(true);
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/top/anime?page=${pageToFetch}`);
-            const data = await response.json();
+            const data = await jikanFetch(`/top/anime?page=${pageToFetch}`);
             
             if (data.data) {
                 // Filter out duplicates that might occur due to list shifting on the server

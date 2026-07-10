@@ -7,7 +7,7 @@ const Navbar = () => {
             <div className="container mx-auto flex items-center justify-between md:flex-row flex-col px-8 py-6 gap-6">
                 <Link 
                   href="/" 
-                  className="font-black md:text-3xl text-xl tracking-[0.15em] uppercase text-black hover:text-swiss-red transition-colors duration-200"
+                  className="font-black md:text-xl text-sm tracking-[0.15em] uppercase text-black hover:text-swiss-red transition-colors duration-200"
                 >
                   NRVANIME LIST
                 </Link>
