@@ -179,3 +179,6 @@ Build and compile files for deployment:
 npm run build
 npm start
 ```
+
+<!-- Vercel Git Trigger -->
+
